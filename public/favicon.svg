@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Tier List Now">
+  <rect width="512" height="512" fill="#23272f" />
+
+  <!-- dark slots (extend under the bumps so the labels sit flush) -->
+  <g fill="#353b46">
+    <rect x="155" y="43" width="314" height="130" rx="12" />
+    <rect x="155" y="191" width="314" height="130" rx="12" />
+    <rect x="155" y="339" width="314" height="130" rx="12" />
+  </g>
+
+  <!-- colored tier labels (rounded left, gentle rounded bump on the right) -->
+  <path d="M55,43 L155,43 Q197,108 155,173 L55,173 Q43,173 43,161 L43,55 Q43,43 55,43 Z" fill="#e35b54" />
+  <path d="M55,191 L155,191 Q197,256 155,321 L55,321 Q43,321 43,309 L43,203 Q43,191 55,191 Z" fill="#f5cf57" />
+  <path d="M55,339 L155,339 Q197,404 155,469 L55,469 Q43,469 43,457 L43,351 Q43,339 55,339 Z" fill="#76c7a2" />
+
+  <!-- star on the top tier -->
+  <path d="M99,88 L104.0,101.12 L118.02,101.82 L107.08,110.63 L110.76,124.18 L99,116.5 L87.24,124.18 L90.92,110.63 L79.98,101.82 L94.0,101.12 Z" fill="#fdfdf7" />
+</svg>
