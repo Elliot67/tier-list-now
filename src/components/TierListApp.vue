@@ -28,8 +28,11 @@ function onNewList() {
   if (confirmTimer) clearTimeout(confirmTimer)
   if (confirmingNew.value) {
     confirmingNew.value = false
-    store.resetToDefaults()
     mode.value = 'rank'
+    // Push a new (hash-less) history entry without reloading, then reset in place — so Back
+    // restores the previous list. The debounced URL sync then writes the default hash here.
+    history.pushState(null, '', `${location.pathname}${location.search}`)
+    store.resetToDefaults()
     return
   }
   confirmingNew.value = true
@@ -69,8 +72,10 @@ onBeforeUnmount(() => {
       <ShareMenu :board-el="boardEl" />
     </div>
 
-    <div v-show="mode === 'rank'">
-      <TierBoard ref="board" />
+    <div class="rank">
+      <div class="rank-board">
+        <TierBoard ref="board" />
+      </div>
       <ItemsTray :items="store.unassignedItems" @configure="mode = 'configure'" />
     </div>
 
@@ -103,6 +108,36 @@ h1 {
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 28px;
+}
+
+/* Mobile: the toolbar actions wrap onto separate rows — add space between them. */
+@media (max-width: 640px) {
+  .toolbar {
+    gap: 16px 12px;
+  }
+}
+
+/* Rank view: stacked on mobile (board, then tray below / sticky bottom bar). */
+.rank {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rank-board {
+  min-width: 0;
+}
+
+/* Desktop: tray becomes a right-hand sidebar sized for 3 cards per row. */
+@media (min-width: 830px) {
+  .rank {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .rank-board {
+    flex: 1 1 auto;
+  }
 }
 
 .new-list {

@@ -47,7 +47,8 @@ function submit() {
   border-radius: 6px;
   padding: 8px;
   font-family: inherit;
-  font-size: 14px;
+  /* >= 16px to avoid iOS Safari auto-zooming the page on focus */
+  font-size: 16px;
 }
 
 .actions {

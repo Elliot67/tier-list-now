@@ -88,7 +88,8 @@ function cancel() {
   border: none;
   border-radius: 4px;
   text-align: center;
-  font-size: 15px;
+  /* >= 16px to avoid iOS Safari auto-zooming the page on focus */
+  font-size: 16px;
   font-weight: 800;
   padding: 6px 4px;
   outline: none;
