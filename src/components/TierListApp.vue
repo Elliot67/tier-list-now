@@ -126,7 +126,7 @@ h1 {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  margin-bottom: 28px;
 }
 
 .new-list {

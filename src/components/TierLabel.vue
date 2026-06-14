@@ -56,7 +56,7 @@ function cancel() {
 
 <style scoped>
 .label {
-  flex: 0 0 80px;
+  flex: 0 0 100px;
   min-height: 90px;
   display: flex;
   align-items: center;
