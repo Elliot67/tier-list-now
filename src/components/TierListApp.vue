@@ -71,8 +71,7 @@ onBeforeUnmount(() => {
     <header class="intro">
       <h1>Tier List Now</h1>
       <p class="tagline">
-        Build a tier list in seconds, then share it — or a blank template — with a single link. No
-        account, no login, no setup.
+        Build a tier list and share it in one link. No account, no login, nothing to set up.
       </p>
     </header>
 
