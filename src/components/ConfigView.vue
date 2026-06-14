@@ -37,12 +37,7 @@ function onAdd(raw: string) {
       <li v-for="item in store.items" :key="item.id" class="card-row">
         <span class="dot" :style="{ backgroundColor: itemColor(item.hue).bg }"></span>
         <span class="card-text">{{ item.text }}</span>
-        <button
-          type="button"
-          class="remove"
-          title="Remove card"
-          @click="store.removeItem(item.id)"
-        >
+        <button type="button" class="remove" title="Remove card" @click="store.removeItem(item.id)">
           ×
         </button>
       </li>

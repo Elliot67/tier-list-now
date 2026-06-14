@@ -65,9 +65,7 @@ function cancelTitle() {
         @rename="(name) => store.renameTier(tier.id, name)"
         @remove="store.removeTier(tier.id)"
       />
-      <p v-if="store.tiers.length === 0" class="empty">
-        No tiers yet — add one to start ranking.
-      </p>
+      <p v-if="store.tiers.length === 0" class="empty">No tiers yet — add one to start ranking.</p>
     </div>
     <button type="button" class="add-row" @click="store.addTier()">
       <svg viewBox="0 0 24 24" aria-hidden="true">

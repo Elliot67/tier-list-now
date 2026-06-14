@@ -34,9 +34,7 @@ onMounted(() => {
         const ordered = store.items.filter((i) => i.tierId === tierId && i.id !== itemId)
         const targetIndex = ordered.findIndex((i) => i.id === data.itemId)
         const beforeId =
-          data.edge === 'left'
-            ? (data.itemId as string)
-            : (ordered[targetIndex + 1]?.id ?? null)
+          data.edge === 'left' ? (data.itemId as string) : (ordered[targetIndex + 1]?.id ?? null)
         store.moveItem(itemId, tierId, beforeId)
       } else if (data.targetType === 'zone') {
         store.moveItem(itemId, data.tierId as string | null, null)
@@ -73,8 +71,8 @@ onBeforeUnmount(() => {
     <header class="intro">
       <h1>Tier List Now</h1>
       <p class="tagline">
-        Build a tier list in seconds, then share it — or a blank template — with a single link.
-        No account, no login, no setup.
+        Build a tier list in seconds, then share it — or a blank template — with a single link. No
+        account, no login, no setup.
       </p>
     </header>
 

@@ -48,7 +48,10 @@ async function exportImage() {
   <div class="share">
     <button
       type="button"
-      :class="{ done: feedback?.key === 'share' && feedback.ok, failed: feedback?.key === 'share' && !feedback.ok }"
+      :class="{
+        done: feedback?.key === 'share' && feedback.ok,
+        failed: feedback?.key === 'share' && !feedback.ok,
+      }"
       @click="copy(false, 'share')"
     >
       <svg v-if="feedback?.key === 'share'" viewBox="0 0 24 24" aria-hidden="true">
@@ -62,7 +65,10 @@ async function exportImage() {
     </button>
     <button
       type="button"
-      :class="{ done: feedback?.key === 'template' && feedback.ok, failed: feedback?.key === 'template' && !feedback.ok }"
+      :class="{
+        done: feedback?.key === 'template' && feedback.ok,
+        failed: feedback?.key === 'template' && !feedback.ok,
+      }"
       @click="copy(true, 'template')"
     >
       <svg v-if="feedback?.key === 'template'" viewBox="0 0 24 24" aria-hidden="true">
@@ -77,7 +83,10 @@ async function exportImage() {
     <button
       type="button"
       class="primary"
-      :class="{ done: feedback?.key === 'export' && feedback.ok, failed: feedback?.key === 'export' && !feedback.ok }"
+      :class="{
+        done: feedback?.key === 'export' && feedback.ok,
+        failed: feedback?.key === 'export' && !feedback.ok,
+      }"
       @click="exportImage"
     >
       <svg v-if="feedback?.key === 'export'" viewBox="0 0 24 24" aria-hidden="true">
@@ -168,5 +177,4 @@ button.primary.failed {
   border-color: var(--danger);
   color: #fff;
 }
-
 </style>

@@ -22,7 +22,7 @@ export interface Rgb {
 export function hslToRgb(h: number, s: number, l: number): Rgb {
   // h in [0,360), s and l in [0,1]
   const c = (1 - Math.abs(2 * l - 1)) * s
-  const hp = ((h % 360) + 360) % 360 / 60
+  const hp = (((h % 360) + 360) % 360) / 60
   const x = c * (1 - Math.abs((hp % 2) - 1))
   let r = 0
   let g = 0

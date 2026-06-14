@@ -64,7 +64,14 @@ describe('serialize', () => {
   })
 
   it('parseState accepts valid input', () => {
-    const parsed = parseState({ v: 1, t: ['S', 'A'], i: [['x', 10, 1], ['y', 20, -1]] })
+    const parsed = parseState({
+      v: 1,
+      t: ['S', 'A'],
+      i: [
+        ['x', 10, 1],
+        ['y', 20, -1],
+      ],
+    })
     expect(parsed).not.toBeNull()
     expect(parsed!.i).toHaveLength(2)
   })

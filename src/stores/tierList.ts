@@ -17,13 +17,11 @@ export const useTierListStore = defineStore('tierList', () => {
 
   const unassignedItems = computed(() => items.value.filter((i) => i.tierId === null))
 
-  const itemsForTier = computed(() => (tierId: string) =>
-    items.value.filter((i) => i.tierId === tierId),
+  const itemsForTier = computed(
+    () => (tierId: string) => items.value.filter((i) => i.tierId === tierId),
   )
 
-  const existingTexts = computed(
-    () => new Set(items.value.map((i) => i.text.toLowerCase())),
-  )
+  const existingTexts = computed(() => new Set(items.value.map((i) => i.text.toLowerCase())))
 
   function addTier() {
     tiers.value.push({ id: createId(), name: '' })
