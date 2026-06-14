@@ -54,3 +54,21 @@ textarea {
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* SortableJS: the drag image (forceFallback clone) — rotate the inner square slightly.
+   Sortable controls the root element's transform for positioning, so rotate .surface. */
+.card-fallback .surface {
+  transform: rotate(4deg);
+}
+
+/* SortableJS: tilt the card the moment it's picked up (chosen), before the drag image
+   appears — animated via the .surface transition. */
+.card-chosen .surface {
+  transform: rotate(4deg);
+}
+
+/* SortableJS: the placeholder left in the list marks the insertion slot (the gap). */
+.card-ghost .surface {
+  opacity: 0.35;
+}
+

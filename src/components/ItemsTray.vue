@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
+import { computed, ref } from 'vue'
 import type { Item } from '@/types'
 import { useTierListStore } from '@/stores/tierList'
+import { useCardSortable } from '@/composables/useCardSortable'
 import ItemSquare from './ItemSquare.vue'
 
 defineProps<{ items: Item[] }>()
@@ -13,22 +13,7 @@ const store = useTierListStore()
 const hasPlacedItems = computed(() => store.items.some((i) => i.tierId !== null))
 
 const zone = ref<HTMLElement | null>(null)
-const isOver = ref(false)
-
-let cleanup: (() => void) | undefined
-
-onMounted(() => {
-  if (!zone.value) return
-  cleanup = dropTargetForElements({
-    element: zone.value,
-    getData: () => ({ targetType: 'zone', tierId: null }),
-    onDragEnter: () => (isOver.value = true),
-    onDragLeave: () => (isOver.value = false),
-    onDrop: () => (isOver.value = false),
-  })
-})
-
-onBeforeUnmount(() => cleanup?.())
+useCardSortable(zone)
 </script>
 
 <template>
@@ -58,7 +43,7 @@ onBeforeUnmount(() => cleanup?.())
       </button>
     </div>
 
-    <div ref="zone" class="zone" :class="{ over: isOver, 'is-empty': items.length === 0 }">
+    <div ref="zone" data-tier-id="" class="zone" :class="{ 'is-empty': items.length === 0 }">
       <ItemSquare v-for="item in items" :key="item.id" :item="item" />
       <p v-if="items.length === 0" class="empty">Add new cards, or drag cards back here.</p>
     </div>
@@ -130,10 +115,6 @@ onBeforeUnmount(() => cleanup?.())
   align-content: flex-start;
   -webkit-user-select: none;
   user-select: none;
-}
-
-.zone.over {
-  box-shadow: inset 0 0 0 2px var(--accent);
 }
 
 .zone.is-empty {

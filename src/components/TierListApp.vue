@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { useTierListStore } from '@/stores/tierList'
 import { useUrlState } from '@/composables/useUrlState'
 import TierBoard from './TierBoard.vue'
@@ -16,31 +15,9 @@ const board = ref<InstanceType<typeof TierBoard> | null>(null)
 const boardEl = computed(() => board.value?.captureEl ?? null)
 
 let cleanupUrl: (() => void) | undefined
-let cleanupMonitor: (() => void) | undefined
 
 onMounted(() => {
   cleanupUrl = init()
-  cleanupMonitor = monitorForElements({
-    canMonitor: ({ source }) => typeof source.data.itemId === 'string',
-    onDrop: ({ source, location }) => {
-      const itemId = source.data.itemId as string
-      const target = location.current.dropTargets[0]
-      if (!target) return
-      const data = target.data
-      if (data.targetType === 'item') {
-        if (data.itemId === itemId) return
-        const tierId = data.tierId as string | null
-        // Items in the target tier, excluding the one being moved, in display order.
-        const ordered = store.items.filter((i) => i.tierId === tierId && i.id !== itemId)
-        const targetIndex = ordered.findIndex((i) => i.id === data.itemId)
-        const beforeId =
-          data.edge === 'left' ? (data.itemId as string) : (ordered[targetIndex + 1]?.id ?? null)
-        store.moveItem(itemId, tierId, beforeId)
-      } else if (data.targetType === 'zone') {
-        store.moveItem(itemId, data.tierId as string | null, null)
-      }
-    },
-  })
 })
 
 // "New list" uses a two-step inline confirm so an accidental click can't wipe the list.
@@ -61,7 +38,6 @@ function onNewList() {
 
 onBeforeUnmount(() => {
   cleanupUrl?.()
-  cleanupMonitor?.()
   if (confirmTimer) clearTimeout(confirmTimer)
 })
 </script>
