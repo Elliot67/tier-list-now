@@ -25,7 +25,11 @@ printWidth 100.
 - `pnpm build` — type-check + production build
 - `pnpm test:unit --run` — unit tests
 - `pnpm lint` — oxlint + eslint (both must pass)
+- `pnpm format` — Prettier (no semicolons, single quotes, printWidth 100)
 - `pnpm type-check` — `vue-tsc`
+
+Always run `pnpm format` (or rely on the editor's Prettier integration) and `pnpm lint`
+before finishing a change — keep code properly formatted and lint-clean.
 
 ## Architecture
 
@@ -65,27 +69,24 @@ printWidth 100.
   pool kept, placement dropped. Live state is untouched. Both share + template links include
   the title (it isn't placement).
 
-### Drag & drop — `@atlaskit/pragmatic-drag-and-drop`
-- Chosen over native HTML5 DnD for **touch/mobile support**.
-- Each `ItemSquare` is a `draggable` and a drop target. Its `data.edge` (`'left'|'right'`) is
-  computed from the pointer vs the card's horizontal midpoint. Each tier zone and the tray is
-  a drop target (data `{ targetType: 'zone', tierId }`).
-- A **single `monitorForElements` in `TierListApp.vue`** handles every drop: it reads the
-  innermost `location.current.dropTargets[0]` and computes `beforeItemId` from `edge`
-  (left = before target, right = before the next item / end), then calls `store.moveItem`.
-  Components only register draggables/targets and reflect hover state.
-- **No dead gaps:** the `.item` is a transparent hitbox with side-padding wrapping an inner
-  `.surface` (the colored square). Adjacent hitboxes touch, so hovering "between" cards always
-  hits a card and shows a left/right **drop indicator** (centered on the gap). Dropping in the
-  empty part of a row shows the indicator on the **last** card (`forceEdge`); an empty tier
-  shows a standalone indicator bar (`overEnd`).
-- The dragged card stays a (no-op) drop target for **itself** so dropping in place doesn't
-  fall through to the zone (which would mean "drop at end").
-- **Custom drag preview:** `setCustomNativeDragPreview` + `preserveOffsetOnSource` renders a
-  clone rotated 4° (origin top-left, so the grab point stays under the cursor — no shadow, which
-  would shift the snapshot). Pressing a card pre-tilts it before the drag starts.
-- Drag regions set `user-select: none` (inputs re-enable it) so a drag never starts a text
-  selection that the browser would hijack as native text DnD.
+### Drag & drop — SortableJS (`src/composables/useCardSortable.ts`)
+- Uses raw **`sortablejs`** (touch + mouse) — we tried `@atlaskit/pragmatic-drag-and-drop`
+  first but its native-HTML5-DnD base doesn't fire on touch. Local types in
+  `src/sortablejs.d.ts`.
+- `useCardSortable(zoneRef)` makes a zone a Sortable drop zone in the shared `cards` group.
+  Each zone carries `data-tier-id` (empty string = unassigned tray) and each `ItemSquare`
+  carries `data-item-id`.
+- **The store stays authoritative.** On `onEnd` the composable reads the target tier and
+  insertion point (`evt.to` + `evt.item.nextElementSibling`) from the DOM, **reverts**
+  Sortable's DOM mutation (so Vue isn't operating on moved nodes), then applies the move via
+  `store.moveItem` and lets Vue re-render. All drag moves still go through `moveItem`.
+- **Visuals** are Sortable classes styled globally in `assets/main.css`: `chosenClass`
+  (`.card-chosen`, the 4° tilt on pickup), `fallbackClass` (`.card-fallback` with
+  `forceFallback`, the rotated drag image — rotate `.surface`, not the root, which Sortable
+  positions), `ghostClass` (`.card-ghost`, the placeholder gap = insertion indicator).
+- `ItemSquare` is presentational: a `.item` hitbox (transparent side-padding for spacing)
+  wrapping the colored `.surface`. Drag regions set `user-select: none` (inputs re-enable it)
+  so a drag never starts a text selection the browser would hijack.
 
 ### Image export (`src/utils/exportImage.ts`)
 - `html-to-image`'s `toPng` over `TierBoard`'s `captureEl` (the `.rows` div — includes the
@@ -96,17 +97,29 @@ printWidth 100.
   images) so style inlining works.
 
 ### Components (`src/components/`)
-- `TierListApp` — root: URL init, the single drop monitor, `mode` ('rank' | 'configure'),
-  toolbar with **New list** (two-step inline confirm → `resetToDefaults`) + `ShareMenu`.
+- `TierListApp` — root: URL init, `mode` ('rank' | 'configure'), toolbar with **New list** +
+  `ShareMenu`. **New list** (two-step inline confirm) does `history.pushState` to a hash-less
+  URL (no reload) then `store.resetToDefaults()`, so Back restores the previous list.
 - `TierBoard` — the captured `.rows` (inline-editable list **title** + `TierRow`s, empty-state
   message) + **Add tier** button (outside the capture). Exposes `captureEl`.
-- `TierRow` → `TierLabel` (inline rename) + `ItemSquare`s; zone drop target + delete cross.
-- `ItemsTray` — the **Rank** view's tray: unassigned-cards drop zone, **Retrieve cards**
-  (`unassignAll`), and a **Configure** toggle (emits `configure`).
-- `ConfigView` — the **Configure** view: `AddItemsPanel` (bulk add) + removable card list +
-  Back button; owns the add feedback.
+- `TierRow` → `TierLabel` (inline rename) + `ItemSquare`s; Sortable zone + delete cross.
+- `ItemsTray` — the **Rank** view's tray: unassigned-cards Sortable zone, **Rollback**
+  (`unassignAll`), and a **Configure** button (emits `configure`).
+- `ConfigView` — the **Configure** view, rendered as a **bottom-sheet modal**
+  (`<Teleport to="body">` + backdrop, `80dvh`, locks body scroll): `AddItemsPanel` (bulk add)
+  + removable card list + Close button; owns the add feedback.
 - `ShareMenu` — Share ranking / Share template / Export image; per-button green success
   feedback shown on the button itself.
+
+### Responsive layout (`TierListApp` + `ItemsTray`)
+- **Desktop (≥830px):** the rank view is a two-column flex — board left, the tray a fixed
+  `270px` right **sidebar** sized for exactly 3 cards/row (min 2-row height).
+- **Mobile (≤640px):** the tray stacks under the board, and a **sticky bottom strip**
+  (Teleported, single scrollable row) appears when the tray scrolls out of view — driven by an
+  `IntersectionObserver` (with a small negative bottom `rootMargin`). It stays visible (compact,
+  with the same empty prompt) even when there are no unassigned cards, and is itself a Sortable
+  zone so cards can be dragged from it into the tiers.
+- Form fields are ≥16px to avoid iOS Safari focus-zoom.
 
 ## Vendored lz-string (`src/vendor/lz-string.js`)
 Converted to a clean **ESM default export** (`export default LZString`) — the original
