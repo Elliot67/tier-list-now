@@ -31,7 +31,15 @@ export function useUrlState() {
   function writeHash() {
     const hash = toHash(store.serialize())
     lastWrittenHash = hash
-    history.replaceState(null, '', `${location.pathname}${location.search}#${hash}`)
+    try {
+      // replaceState avoids polluting browser history on every change.
+      history.replaceState(null, '', `${location.pathname}${location.search}#${hash}`)
+    } catch {
+      // Some contexts reject replaceState ("The operation is insecure" — e.g. sandboxed
+      // frames, opaque origins, or rate-limiting). Fall back to setting the hash directly;
+      // onHashChange ignores it via the lastWrittenHash guard.
+      location.hash = hash
+    }
   }
 
   function onHashChange() {
